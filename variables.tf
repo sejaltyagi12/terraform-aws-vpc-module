@@ -23,3 +23,44 @@ variable "subnet_config" {
     error_message = "Invalid CIDR Format"
   }
 }
+
+variable "security_group_config" {
+  description = "Security group configuration including ingress and egress rules"
+  type = map(object({
+    description = string
+    ingress = list(object({
+      description = string
+      protocol    = string
+      from_port   = number
+      to_port     = number
+      cidr_blocks = list(string)
+    }))
+    egress = list(object({
+      description = string
+      protocol    = string
+      from_port   = number
+      to_port     = number
+      cidr_blocks = list(string)
+    }))
+  }))
+
+  validation {
+    condition = alltrue([
+      for sg_key, config in var.security_group_config :
+        alltrue([
+          for rule in config.ingress : alltrue([
+            for cidr in rule.cidr_blocks : can(cidrnetmask(cidr))
+          ])
+        ])
+    ]) && alltrue([
+      for sg_key, config in var.security_group_config :
+        alltrue([
+          for rule in config.egress : alltrue([
+            for cidr in rule.cidr_blocks : can(cidrnetmask(cidr))
+          ])
+        ])
+    ])
+    error_message = "Invalid CIDR format in ingress or egress rules."
+  }
+}
+

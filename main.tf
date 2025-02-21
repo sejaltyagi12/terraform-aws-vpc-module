@@ -52,3 +52,32 @@ resource "aws_route_table_association" "main" {
   subnet_id = aws_subnet.main[each.key].id
   route_table_id = aws_route_table.main[0].id     #as there is only one route table in the list
 } 
+
+resource "aws_security_group" "sg" {
+  for_each    = var.security_group_config
+  name        = each.key
+  description = each.value.description
+  vpc_id      = aws_vpc.main.id
+
+  dynamic "ingress" {
+    for_each = each.value.ingress
+    content {
+      description = ingress.value.description
+      protocol    = ingress.value.protocol
+      from_port   = ingress.value.from_port
+      to_port     = ingress.value.to_port
+      cidr_blocks = ingress.value.cidr_blocks
+    }
+  }
+
+  dynamic "egress" {
+    for_each = each.value.egress
+    content {
+      description = egress.value.description
+      protocol    = egress.value.protocol
+      from_port   = egress.value.from_port
+      to_port     = egress.value.to_port
+      cidr_blocks = egress.value.cidr_blocks
+    }
+  }
+}

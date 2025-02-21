@@ -28,3 +28,8 @@ output "public_subnets" {
 output "private_subnets" {
   value = local.private_subnet_output
 }
+
+output "security_group_ids" {
+  description = "List of security group IDs"
+  value       = { for key, sg in aws_security_group.sg : key => sg.id }
+}
