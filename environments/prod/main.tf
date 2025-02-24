@@ -1,6 +1,3 @@
-variable "vpc_config" {}
-variable "subnet_config" {}
-
 module "vpc" {
   source = "../../module/vpc"
 

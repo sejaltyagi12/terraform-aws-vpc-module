@@ -15,3 +15,5 @@ subnet_config = {
     az         = "ap-south-1b"
   }
 }
+
+
